@@ -9,6 +9,8 @@ import sys
 import argparse
 from typing import Any
 
+from tqdm import tqdm
+
 import torch
 import torch.nn as nn
 import torchvision.models as models
@@ -131,7 +133,7 @@ def update_state_dict(state_dict, idx_start=9):
 def get_accuracy(model, x_orig, y_orig, bs=64, device=torch.device('cuda:0')):
     n_batches = x_orig.shape[0] // bs
     acc = 0.
-    for counter in range(n_batches):
+    for counter in tqdm(range(n_batches), desc='get_accuracy', leave=False):
         x = x_orig[counter * bs:min((counter + 1) * bs, x_orig.shape[0])].clone().to(device)
         y = y_orig[counter * bs:min((counter + 1) * bs, x_orig.shape[0])].clone().to(device)
         output = model(x)
