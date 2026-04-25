@@ -1,0 +1,43 @@
+FROM nvidia/cuda:12.6.0-devel-ubuntu24.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install package dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential \
+        autoconf \
+        automake \
+        libtool \
+        pkg-config \
+        ca-certificates \
+        wget \
+        git \
+        curl \
+        libjpeg-dev \
+        libpng-dev \
+        python3-dev \
+        python3-setuptools \
+        zlib1g-dev \
+        swig \
+        cmake \
+        vim \
+        locales \
+        locales-all \
+        screen \
+        zip \
+        unzip \
+    && apt-get clean
+
+ENV LC_ALL en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
+
+RUN rm -f /usr/lib/python3.12/EXTERNALLY-MANAGED && \
+    ln -sf /usr/bin/python3 /usr/local/bin/python && \
+    curl -sS https://bootstrap.pypa.io/get-pip.py | python3 && \
+    pip install --upgrade pip setuptools
+
+RUN pip install torch torchvision --index-url https://download.pytorch.org/whl/cu126
+
+COPY requirements_ubuntu24.txt .
+RUN pip install -r requirements_ubuntu24.txt

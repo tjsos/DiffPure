@@ -24,14 +24,49 @@ results, outperforming current adversarial training and adversarial purification
 ## Requirements
 
 - 1-4 high-end NVIDIA GPUs with 32 GB of memory.
+- Docker and the NVIDIA Container Toolkit must be installed. To install the toolkit:
+    ```bash
+    curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+    curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
+      sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+      sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+    sudo apt-get update && sudo apt-get install -y nvidia-container-toolkit
+    sudo nvidia-ctk runtime configure --runtime=docker
+    sudo systemctl restart docker
+    ```
+  Verify with: `docker run --rm --gpus all nvidia/cuda:12.6.0-base-ubuntu24.04 nvidia-smi`
+
+**Ubuntu 20.04 + CUDA 11.0 (original)**
 - 64-bit Python 3.8.
-- CUDA=11.0 and docker must be installed first.
-- Installation of the required library dependencies with Docker:
+- Installation with Docker:
     ```bash
     docker build -f diffpure.Dockerfile --tag=diffpure:0.0.1 .
-    docker run -it -d --gpus 0 --name diffpure --shm-size 8G -v $(pwd):/workspace -p 5001:6006 diffpure:0.0.1
+    docker run -it -d --gpus all --name diffpure --shm-size 8G -v $(pwd):/workspace -p 5001:6006 diffpure:0.0.1
     docker exec -it diffpure bash
     ```
+- Alternatively, install directly into a local Python 3.8 environment:
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+**Ubuntu 24.04 + CUDA 12.6**
+- 64-bit Python 3.12.
+- Installation with Docker:
+    ```bash
+    docker build -f diffpure_ubuntu24.Dockerfile --tag=diffpure:ubuntu24 .
+    docker run -it -d --gpus all --name diffpure --shm-size 8G -v $(pwd):/workspace -p 5001:6006 diffpure:ubuntu24
+    docker exec -it diffpure bash
+    ```
+- Alternatively, install directly into a local Python 3.12 environment:
+    ```bash
+    pip install -r requirements_ubuntu24.txt
+    ```
+- For HPC environments where Docker is unavailable, use Apptainer:
+    ```bash
+    apptainer build diffpure_ubuntu24.sif diffpure_ubuntu24.def
+    apptainer run --nv --bind $(pwd):/workspace diffpure_ubuntu24.sif
+    ```
+  `--nv` passes through the host NVIDIA GPU drivers. `--bind` mounts the repo into the container.
 
 ## Data and pre-trained models
 

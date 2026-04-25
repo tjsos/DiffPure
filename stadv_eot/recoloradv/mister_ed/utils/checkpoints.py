@@ -84,7 +84,7 @@ def params_to_filename(experiment_name, architecture, epoch_val=None):
 
     glob_prefix = os.path.join(*[CHECKPOINT_DIR,
                                  '%s.%s.*' % (experiment_name, architecture)])
-    re_prefix = '%s\.%s\.' % (experiment_name, architecture)
+    re_prefix = r'%s\.%s\.' % (experiment_name, architecture)
     re_suffix = r'\.path\.tar'
 
     valid_name = lambda f: bool(re.match(re_prefix + r'\d{6}' + re_suffix, f))
