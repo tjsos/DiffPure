@@ -45,4 +45,4 @@ From: nvidia/cuda:12.6.0-devel-ubuntu24.04
     pip install -r /requirements_ubuntu24.txt
 
 %runscript
-    exec python "$@"
+    exec bash "$@"
